@@ -201,7 +201,7 @@
 
     function getSource(ele, options) {
         var dataBreakpoints = ele.getAttribute('data-breakpoints');
-        //Do we data-breakpoints? Then lets see if we have a cached source (for optimization) def for the breakpoint set else use default source
+        //Do we have data-breakpoints? Then lets see if we have a cached source (for optimization) def for the breakpoint set else use default source
         var source = dataBreakpoints ? breakpointSourceMap[dataBreakpoints] : source;
         if (!source && dataBreakpoints) { //We have breakpoints defined, but no cached source yet
             var breakpoints = dataBreakpoints.split(',');
