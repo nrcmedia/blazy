@@ -205,7 +205,7 @@
         var source = dataBreakpoints ? breakpointSourceMap[dataBreakpoints] : source;
         if (!source && dataBreakpoints) { //We have breakpoints defined, but no cached source yet
             var breakpoints = dataBreakpoints.split(',');
-            breakpoints.sort();
+            breakpoints.sort(function(a,b) { return parseInt(a)>parseInt(b); });
             each(breakpoints, function(breakpointWidth) {
                 breakpointWidth = parseInt(breakpointWidth);
                 if (breakpointWidth >= screenWidth) {
