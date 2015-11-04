@@ -200,12 +200,21 @@
     }
 
     function getSource(ele, options) {
-        var dataBreakpoints = ele.getAttribute('data-breakpoints');
-        //Do we have data-breakpoints? Then lets see if we have a cached source (for optimization) def for the breakpoint set else use default source
-        var source = dataBreakpoints ? breakpointSourceMap[dataBreakpoints] : source;
-        if (!source && dataBreakpoints) { //We have breakpoints defined, but no cached source yet
-            var breakpoints = dataBreakpoints.split(',');
-            breakpoints.sort(function(a,b) { return parseInt(a)>parseInt(b); });
+        var breakpoints = [],
+            key, attribute;
+        for (key in ele.attributes) {
+            attribute = ele.attributes[key];
+            //Does the attribute start with data-src-number?
+            if (/^data-src-[0-9]/.test(attribute.name)) {
+                //Store this is a breakpoint value
+                breakpoints.push(parseInt(attribute.name.replace('data-src-', '')));
+            }
+        }
+        breakpoints.sort(function (a, b) { return a > b; });
+
+        //Did we find breakpoint data sources? Then lets see if we have a cached source (for optimization) def for the breakpoint set else use default source
+        var source = breakpoints.length > 0 ? breakpointSourceMap[breakpoints.join(',')] : source;
+        if (!source && breakpoints.length > 0) { //We have breakpoints defined, but no cached source yet
             each(breakpoints, function(breakpointWidth) {
                 breakpointWidth = parseInt(breakpointWidth);
                 if (breakpointWidth >= screenWidth) {
@@ -214,7 +223,7 @@
                 }
             });
             //Cache the found source, or default back to options.src
-            breakpointSourceMap[dataBreakpoints] = source = source || options.src;
+            breakpointSourceMap[breakpoints.join(',')] = source = source || options.src;
         }
 
         return source;
