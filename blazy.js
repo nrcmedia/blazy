@@ -21,7 +21,7 @@
     'use strict';
 
     //private vars
-    var source, viewport, isRetina;
+    var source, viewport, isRetina, screenWidth, breakpointSourceMap;
 
     // constructor
     return function Blazy(options) {
@@ -60,6 +60,8 @@
         viewport = {};
         viewport.top = 0 - scope.options.offset;
         viewport.left = 0 - scope.options.offset;
+        screenWidth = window.screen.width;
+        breakpointSourceMap = {};
 
 
         /* public functions
@@ -104,7 +106,7 @@
 
         //handle multi-served image src
         each(scope.options.breakpoints, function(object) {
-            if (object.width >= window.screen.width) {
+            if (object.width >= screenWidth) {
                 source = object.src;
                 return false;
             }
@@ -165,6 +167,7 @@
     function loadElement(ele, force, options) {
         // if element is visible, not loaded or forced
         if (!isElementLoaded(ele, options) && force || options.loadInvisible || (ele.offsetWidth > 0 && ele.offsetHeight > 0)) {
+            var source = getSource(ele, options);
             var dataSrc = ele.getAttribute(source) || ele.getAttribute(options.src); // fallback to default 'data-src'
             if (dataSrc) {
                 var dataSrcSplitted = dataSrc.split(options.separator);
@@ -194,6 +197,36 @@
                 ele.className = ele.className + ' ' + options.errorClass;
             }
         }
+    }
+
+    function getSource(ele, options) {
+        var breakpoints = [],
+            key, attribute;
+        for (key in ele.attributes) {
+            attribute = ele.attributes[key];
+            //Does the attribute start with data-src-number?
+            if (/^data-src-[0-9]/.test(attribute.name)) {
+                //Store this is a breakpoint value
+                breakpoints.push(parseInt(attribute.name.replace('data-src-', '')));
+            }
+        }
+        breakpoints.sort(function (a, b) { return a > b; });
+
+        //Did we find breakpoint data sources? Then lets see if we have a cached source (for optimization) def for the breakpoint set else use default source
+        var source = breakpoints.length > 0 ? breakpointSourceMap[breakpoints.join(',')] : source;
+        if (!source && breakpoints.length > 0) { //We have breakpoints defined, but no cached source yet
+            each(breakpoints, function(breakpointWidth) {
+                breakpointWidth = parseInt(breakpointWidth);
+                if (breakpointWidth >= screenWidth) {
+                    source = 'data-src-' + breakpointWidth;
+                    return false;
+                }
+            });
+            //Cache the found source, or default back to options.src
+            breakpointSourceMap[breakpoints.join(',')] = source = source || options.src;
+        }
+
+        return source;
     }
 
     function isElementLoaded(ele, options) {

@@ -43,6 +43,13 @@ Exchange `latest` with the specific version number if you want to lock it in.
 * bLazy is lightweight, less than 1.2KB and less than 1.05KB if you don't need IE7- support.
 * bLazy is AMD, CommonJS and Browser globals compatible.
 
+## Inline breakpoints
+Example of how inline breakpoints can be used.
+```html
+<img class="b-lazy" data-src-320="320.jpg|640.jpg" data-src-640="640.jpg|1280.jpg" data-src="1280.jpg|2560.jpg">
+```
+Elements that make use of the inline breakpoints will ignore the config.options.breakpoints settings
+
 ## CHANGELOG
 ### v 1.5.0 (2015/10/30) ###
 * Added new feature. Now you can lazy load everything with a src attribute like iframes, unity games etc.
