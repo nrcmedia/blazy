@@ -203,6 +203,9 @@
         var breakpoints = [],
             key, attribute;
         for (key in ele.attributes) {
+            if (!ele.attributes.hasOwnProperty(key)) {
+                continue;
+            }
             attribute = ele.attributes[key];
             //Does the attribute start with data-src-number?
             if (/^data-src-[0-9]/.test(attribute.name)) {
